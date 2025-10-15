@@ -1,0 +1,21 @@
+# Go build artifacts
+/go.sum
+/go.work
+/go.work.sum
+*.exe
+*.test
+*.out
+
+# Binaries
+app
+*.db
+
+# Environment files
+.env
+
+# IDE/editor stuff
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store

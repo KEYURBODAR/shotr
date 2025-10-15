@@ -1,4 +1,4 @@
-// config.go
+// package config
 package config
 
 import (
@@ -8,17 +8,19 @@ import (
 
 // Config holds runtime configuration for the app.
 type Config struct {
-	Port         string
-	BaseHost     string
+	Port        string
+	BaseHost    string
+	DatabaseURL string // libsql://... (Turso)
 	DatabasePath string
-	AppEnv  string // "development" | "production"
-	LogLevel string
+	AppEnv      string // "development" | "production"
+	LogLevel    string
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
 		Port:         getenv("PORT", "8080"),
 		BaseHost:     os.Getenv("BASE_HOST"),
+		DatabaseURL:  os.Getenv("DATABASE_URL"),
 		DatabasePath: getenv("DATABASE_PATH", "data/db.sqlite3"),
 		AppEnv:       getenv("APP_ENV", "production"),
 		LogLevel:     getenv("LOG_LEVEL", "info"),

@@ -38,7 +38,7 @@ func (l *Link) Create(c echo.Context) error {
 		URL string `json:"url" validate:"required,url"`
 	}
 	if err := h.BindAndValidate(c, &req); err != nil {
-		return err
+		return h.JSONError(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()

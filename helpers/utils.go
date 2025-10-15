@@ -4,14 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"shotr/db"
 
 	"github.com/avast/retry-go"
-	"github.com/labstack/echo/v4"
 	"github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
@@ -71,39 +69,3 @@ func isUniqueConstraint(err error) bool {
 	msg := strings.ToLower(err.Error())
 	return strings.Contains(msg, "unique constraint") || strings.Contains(msg, "constraint failed")
 }
-
-func BuildShortURL(c echo.Context, baseHost, slug string) string {
-	if baseHost != "" {
-		return fmt.Sprintf("%s/%s", strings.TrimRight(baseHost, "/"), slug)
-	}
-
-	req := c.Request()
-	scheme := "http"
-	if req.TLS != nil {
-		scheme = "https"
-	}
-	
-	return fmt.Sprintf("%s://%s/%s", scheme, req.Host, slug)
-}
-
-func IncClicks(ctx context.Context, q *db.Queries, n int64, slug string, log *zap.Logger) {
-	go func() {
-		err := q.AddClick(ctx, db.AddClickParams{
-			Clicks: sql.NullInt64{Int64: n, Valid: true},
-			Slug: slug,
-		})
-		if err != nil && log != nil {
-			log.Warn("failed to increment clicks", zap.Error(err), zap.String("slug", slug))
-		}
-
-		if err := q.SaveDailyClicks(ctx, db.SaveDailyClicksParams{
-			Slug: slug,
-			Clicks: sql.NullInt64{
-				Int64: n,
-				Valid: true,
-			},
-		}); err != nil && log != nil {
-			log.Warn("failed to increment daily clicks", zap.Error(err), zap.String("slug", slug))
-		}
-	}()
-} 
